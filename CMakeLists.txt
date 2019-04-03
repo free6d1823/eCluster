@@ -32,6 +32,7 @@ add_executable(${PROJECT_NAME}
     cubic.cpp
     cluster.cpp
     speedmeter.cpp
+    sphere.cpp
     lib/GlHelper.cpp
     lib/Mat.cpp
     lib/vecmath.cpp
