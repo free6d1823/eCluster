@@ -17,9 +17,14 @@ GLFWwindow* window;
 #include "lib/GlHelper.h"
 #include "cubic.h"
 #include "speedmeter.h"
+#include "sphere.h"
+#include "gltext.h"
+
 #define SCREEN_WIDTH 1024
 #define SCREEN_HEIGHT   600
 
+GlText mText;
+Sphere mBkgnd;
 RpmMeter   mObject1;
 SpeedMeter mObject2;
 
@@ -176,6 +181,7 @@ int main( void )
     glDepthFunc(GL_LESS);
     glEnable(GL_CULL_FACE);
 
+    mBkgnd.init(5, Vec3(0,0,0), "sphere.png");
     mObject1.init();
     mObject2.init();
      // For speed computation
@@ -219,6 +225,8 @@ int main( void )
         // Clear the screen
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        mBkgnd.update(mMatProj, mMatView, mPosLight);
+        mBkgnd.draw();
         mObject1.update(mMatProj, mMatView, mPosLight);
         mObject1.draw();
         mObject2.update(mMatProj, mMatView, mPosLight);
@@ -231,6 +239,7 @@ int main( void )
     while( glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
            glfwWindowShouldClose(window) == 0 );
 
+    mBkgnd.cleanup();
     mObject1.cleanup();
     mObject2.cleanup();
     // Close OpenGL window and terminate GLFW

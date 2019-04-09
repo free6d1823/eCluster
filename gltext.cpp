@@ -1,7 +1,10 @@
-#include "sphere.h"
+#include "gltext.h"
 #include "SOIL/SOIL.h"
 #include "lib/datatype.h"
 #include "lib/GlHelper.h"
+
+#include <ft2build.h>
+#include FT_FREETYPE_H
 
 static const char VERTEX_SHADER_TEXTURE[] =
         "#version 330 core\n"
@@ -23,19 +26,26 @@ static const char FRAGMENT_SHADER_TEXTURE[] =
                 "color = texture(myTextureSampler, Uv).rgb;\n"
          "}\n";
 
-Sphere::Sphere():mProgramId(0),
+GlText::GlText():mProgramId(0),
         mMvpMatrixUniform(0), mVaoId(0), mTextureData(-1), mTextureUniform(-1)
 {
     mNumToDraw = 0;
     mVertexBufId[0] = mVertexBufId[1] =  mVertexBufId[2] = -1;
 
+    FT_Library ft;
+    if (FT_Init_FreeType(&ft))
+        fprintf(stderr, "ERROR::FREETYPE: Could not init FreeType Library");
 
+    FT_Face face;
+    if (FT_New_Face(ft, "fonts/arial.ttf", 0, &face))
+         fprintf(stderr, "ERROR::FREETYPE: Failed to load font");
+FT_Set_Pixel_Sizes(face, 0, 48);
 
 }
-Sphere::~Sphere()
+GlText::~GlText()
 {
 }
-bool Sphere::load(float r, Vec3& pos, vector < Vec3 > & vertices, vector <Vec2 > & uvs, vector < unsigned short > & index)
+bool GlText::load(float r, Vec3& pos, vector < Vec3 > & vertices, vector <Vec2 > & uvs, vector < unsigned short > & index)
 {
     int i,j;
 #define lats 32
@@ -114,7 +124,7 @@ bool Sphere::load(float r, Vec3& pos, vector < Vec3 > & vertices, vector <Vec2 >
 
 }
 
-bool Sphere::init(float scale, Vec3 pos, const char* bkgnd)
+bool GlText::init(float scale, Vec3 pos, const char* bkgnd)
 {
     glGenVertexArrays(1, &mVaoId);
     glBindVertexArray(mVaoId);
@@ -154,11 +164,11 @@ bool Sphere::init(float scale, Vec3 pos, const char* bkgnd)
 
 }
 
-void Sphere::transform(Mat4& transform)
+void GlText::transform(Mat4& transform)
 {
     mMatModel = mMatModel * transform;
 }
-void Sphere::update(Mat4& pojection, Mat4& view, Vec3& light)
+void GlText::update(Mat4& pojection, Mat4& view, Vec3& light)
 {
     mMatMvp = pojection * view * mMatModel;
 
@@ -166,7 +176,7 @@ void Sphere::update(Mat4& pojection, Mat4& view, Vec3& light)
 
 }
 
-void Sphere::cleanup()
+void GlText::cleanup()
 {
 
 
@@ -190,7 +200,7 @@ void Sphere::cleanup()
 
 }
 
-void Sphere::draw(bool bReload)
+void GlText::draw(bool bReload)
 {
     glUseProgram(mProgramId);
     glUniformMatrix4fv(mMvpMatrixUniform, 1, GL_FALSE, mMatMvp.Ptr());
